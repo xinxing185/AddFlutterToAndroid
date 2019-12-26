@@ -1,5 +1,5 @@
 # AddFlutterToAndroid
 
-directory /android is the Host Android Project
+The directory /android is the Host Android Project
 
-directory /flutter_module is the Flutter module project
+The directory /flutter_module is the Flutter module project
