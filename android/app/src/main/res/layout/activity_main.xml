@@ -23,8 +23,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_main"
-        android:visibility="gone"
-        android:text="Test"
+        android:text="Flutter List"
+        android:textAllCaps="false"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
+    <Button
+        android:id="@+id/btn_page2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_page1"
+        android:text="Flutter Grid"
         android:textAllCaps="false"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
 

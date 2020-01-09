@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_module/page/home.dart';
 import 'package:flutter_module/page/product_list.dart';
 import 'package:flutter_module/page/user_list.dart';
+import 'dart:ui';
+
+import 'package:flutter/services.dart';
 
 void main() {
-  runApp(MyFlutterView(HomePage()));
+  runApp(MyFlutterView());
 }
-void product() => runApp(MyFlutterView(ProductList()));
-void user() => runApp(MyFlutterView(UserList()));
+//void product() => runApp(MyFlutterView(ProductList()));
+//void user() => runApp(MyFlutterView(UserList()));
 
 // useless
-Widget chooseWidget(String routeName) {
+/*Widget chooseWidget(String routeName) {
   print(routeName);
   switch (routeName) {
     case 'demo':
@@ -28,12 +31,10 @@ Widget chooseWidget(String routeName) {
           child: Text('Unkown Route'),
         );
   }
-}
+}*/
 
 class MyFlutterView extends StatelessWidget {
-  Widget homePage;
-
-  MyFlutterView(this.homePage);
+  MyFlutterView();
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +44,22 @@ class MyFlutterView extends StatelessWidget {
           primaryColor: Colors.white,
         ),
 
-        home: homePage
+        home: Container(
+          width: window.physicalSize.width,
+          height: window.physicalSize.height,
+          color: Colors.white,
+        ),
+      routes: <String, WidgetBuilder> {
+        '/home': (BuildContext context) => _navigator(context, HomePage()),
+        '/user_list': (BuildContext context) => _navigator(context, UserList(true)),
+        '/product_list': (BuildContext context) => _navigator(context, ProductList(true)),
+      },
     );
+  }
+
+  Widget _navigator(BuildContext context, Widget page) {
+//    Navigator.of(context).popUntil(ModalRoute.withName('/'));
+    return page;
   }
 }
 

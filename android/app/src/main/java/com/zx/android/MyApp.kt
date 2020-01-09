@@ -33,12 +33,18 @@ class MyApp : Application() {
         }
     }
 
-//    override fun onTerminate() {
-//        super.onTerminate()
-//    }
+    override fun onTerminate() {
+        println("onTerminate")
+        super.onTerminate()
+        var modules = FlutterModules.values()
+        for (flutterModule in modules) {
+            FlutterEngineCache.getInstance().remove(flutterModule.name)
+        }
+    }
 
     enum class FlutterModules {
         main,
-        demo
+//        user,
+//        product
     }
 }

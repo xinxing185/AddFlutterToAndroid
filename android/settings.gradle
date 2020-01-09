@@ -1,5 +1,5 @@
 include ':app'
-rootProject.name='adnroid'
+rootProject.name='android'
 setBinding(new Binding([gradle: this]))                                 // new
 evaluate(new File(                                                      // new
         settingsDir.parentFile,                                               // new

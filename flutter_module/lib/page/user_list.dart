@@ -1,16 +1,26 @@
-import 'package:flutter_module/bridge/native_method.dart';
-import 'package:flutter_module/model/user.dart';
-import 'package:flutter_module/net/http_util.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_module/model/user.dart';
+import 'package:flutter_module/net/http_util.dart';
 
+import 'navigator_util.dart';
+import 'statusbar_util.dart';
+
+// ignore: must_be_immutable
 class UserList extends StatefulWidget {
+  bool isSinglePage; // 是否单页，是则返回时关闭Activity
+
+  UserList(this.isSinglePage);
 
   @override
-  UserListState createState() => UserListState();
+  UserListState createState() => UserListState(this.isSinglePage);
 }
 
 class UserListState extends State<StatefulWidget> {
+  UserListState(this.isSinglePage);
+
+  bool isSinglePage;
+
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<UserBean> users = <UserBean>[];
@@ -22,6 +32,8 @@ class UserListState extends State<StatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
+    StatusBarUtil.dark(null);
+
     // user FutureBuilder fro loading initially
     var contentView = Container(
         child: FutureBuilder(future: _fetchDataAsync(),
@@ -54,30 +66,37 @@ class UserListState extends State<StatefulWidget> {
             }
         )
     );
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          tooltip: "back",
-          onPressed: () => NativeMethod.finishActivity(),
-        ),
-        elevation: 0.5,
-        toolbarOpacity: 1,
-        titleSpacing: 0.0,
-        centerTitle: true,
-        title: Text(
-          "标准AppBar",
-          style: TextStyle(fontSize: 15, fontStyle: FontStyle.normal),
-        ),
-      ),
-      body:
-      Container(
-          child: Center(
-            child: contentView,
-          )
-      ),
-    );
+    return new WillPopScope(
+        onWillPop: _onBackPressed,
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              tooltip: "back",
+              onPressed: () => NavigatorUtil.pop(context, isSinglePage),
+            ),
+            elevation: 0.5,
+            toolbarOpacity: 1,
+            titleSpacing: 0.0,
+            centerTitle: true,
+            title: Text(
+              "标准AppBar",
+              style: TextStyle(fontSize: 15, fontStyle: FontStyle.normal),
+            ),
+          ),
+          body:
+          Container(
+              child: Center(
+                child: contentView,
+              )
+          ),
+        ));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   _buildUserItem(BuildContext context, int i) {
@@ -145,10 +164,12 @@ class UserListState extends State<StatefulWidget> {
     var prds = UsersBean
         .fromMap(res.data);
     _snakeBarTips("data success ${prds.total}");
-    setState(() {
-      users.addAll(prds.data);
+    if (mounted) {
+      setState(() {
+        users.addAll(prds.data);
 //      users = prds.data;
-    });
+      });
+    }
   }
 
   _fetchData() {
@@ -177,7 +198,13 @@ class UserListState extends State<StatefulWidget> {
       backgroundColor: Colors.blue,
       duration: Duration(seconds: 2), // 持续时间
     );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
+
+    _scaffoldKey.currentState?.showSnackBar(snackBar);
   }
 
+
+  Future<bool> _onBackPressed() {
+    NavigatorUtil.pop(context, isSinglePage);
+    return Future.value(false);
+  }
 }

@@ -1,4 +1,4 @@
-package com.zx.adnroid
+package com.zx.android
 
 import org.junit.Test
 

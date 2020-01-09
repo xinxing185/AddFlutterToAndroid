@@ -20,6 +20,7 @@ public class ToastMethodCallHandler extends DefaultMethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
         super.onMethodCall(call, result);
+        String s = call.argument("msg");
         if (call.method.equals("showToast")) {
             Toast.makeText(mContext, call.argument("msg"), Toast.LENGTH_LONG).show();
         }

@@ -2,7 +2,7 @@ package com.zx.android
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.zx.adnroid.R
+import com.zx.android.R
 
 /**
  * MyActivity

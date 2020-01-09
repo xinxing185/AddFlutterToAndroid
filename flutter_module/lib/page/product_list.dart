@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter_module/bridge/native_method.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_module/model/category.dart';
 import 'package:flutter_module/model/product.dart';
 import 'package:flutter_module/model/response.dart';
@@ -8,22 +9,31 @@ import 'package:flutter_module/net/api.dart';
 import 'package:flutter_module/net/http_util.dart';
 import 'package:flutter_module/request/get_category.dart';
 import 'package:flutter_module/request/get_product.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 
+import 'navigator_util.dart';
+import 'statusbar_util.dart';
+
+// ignore: must_be_immutable
 class ProductList extends StatefulWidget {
+  bool isSinglePage;  // 是否单页，是则返回时关闭Activity
+
+  ProductList(this.isSinglePage);
 
   @override
-  ProductListState createState() => ProductListState();
+  ProductListState createState() => ProductListState(this.isSinglePage);
 }
 
 class ProductListState extends State<StatefulWidget> {
+  ProductListState(this.isSinglePage);
+
   LoadMoreStatus loadMoreStatus = LoadMoreStatus.STABLE;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController scrollController = ScrollController();
 
   var products = <ProductItem>[];
   int pageIndex = 1;
+
+  bool isSinglePage;
 
   @override
   void initState() {
@@ -32,11 +42,14 @@ class ProductListState extends State<StatefulWidget> {
 
   @override
   void dispose() {
+    super.dispose();
     scrollController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    StatusBarUtil.dark(null);
+
     var contentView;
     if (products == null || products.length == 0) {
       contentView = Center(
@@ -65,7 +78,7 @@ class ProductListState extends State<StatefulWidget> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           tooltip: "back",
-          onPressed: () => NativeMethod.finishActivity(),
+          onPressed: () => NavigatorUtil.pop(context, isSinglePage),
         ),
         elevation: 0.5,
         toolbarOpacity: 1,
@@ -167,13 +180,15 @@ class ProductListState extends State<StatefulWidget> {
 
     ResponseBody1<Product> responseBody = ResponseBody1<Product>.fromJson(map);
     Product productList = responseBody.getData(Product());
-    setState(() {
-      loadMoreStatus = LoadMoreStatus.STABLE;
-      if (productList.items != null && productList.items.length > 0) {
-        pageIndex++;
-        products.addAll(productList.items);
-      }
-    });
+    if (mounted) {
+      setState(() {
+        loadMoreStatus = LoadMoreStatus.STABLE;
+        if (productList.items != null && productList.items.length > 0) {
+          pageIndex++;
+          products.addAll(productList.items);
+        }
+      });
+    }
   }
 
   _fetchCategoryData() {
