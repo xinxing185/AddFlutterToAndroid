@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: titleColor),
         tooltip: "back",
-        onPressed: () => NativeMethod.finishActivity(),
+        onPressed: () => NavigatorUtil.pop(context, true),
       ),
       elevation: 0.5,
       toolbarOpacity: 1,

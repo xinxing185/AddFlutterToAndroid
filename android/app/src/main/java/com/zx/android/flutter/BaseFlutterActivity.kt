@@ -2,7 +2,7 @@ package com.zx.android.flutter
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
+import com.zx.android.demo.FlutterModuleChannel
 import com.zx.android.demo.RouteMethodCallHandler
 import com.zx.android.demo.ToastMethodCallHandler
 import com.zx.android.plugin.FlutterNativeBridge
@@ -10,8 +10,6 @@ import com.zx.android.util.StatusBarUtil
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
-import io.flutter.embedding.engine.dart.DartExecutor
-import io.flutter.view.FlutterMain
 
 /**
  * me.action.appexplore.flutter.BaseFlutterActivity
@@ -21,15 +19,18 @@ import io.flutter.view.FlutterMain
 
 class BaseFlutterActivity : FlutterActivity() {
     companion object {
-        const val EXTRA_ENTRY_POINT = "entry_point"
+        const val EXTRA_ROUTE = "route"     // 路由页面名，使用同一个FLutterEngine,同一个ENTRY_POINT,该参数用于初始页面跳转
         const val CHANNEL_TOAST = "me.action.plugins/toast"
         const val CHANNEL_ROUTE = "me.action.plugins/route"
     }
 
     private var mNativeBridge : FlutterNativeBridge? = null
 
+    private var moduleChannel : FlutterModuleChannel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 设置透明状态栏
         StatusBarUtil.setTransparentForWindow(this)
 //        StatusBarUtil.setDarkMode(this)
         StatusBarUtil.setLightMode(this)
@@ -45,15 +46,10 @@ class BaseFlutterActivity : FlutterActivity() {
 
     override fun onResume() {
         super.onResume()
+        // 路由到指定页面
         if (!getPageName().isNullOrEmpty()) {
             flutterEngine?.navigationChannel?.pushRoute(getPageName()!!)
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        flutterEngine?.navigationChannel?.popRoute()
-//        Handler().postDelayed({ flutterEngine?.navigationChannel?.popRoute() }, 100)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -74,22 +70,20 @@ class BaseFlutterActivity : FlutterActivity() {
                 )
             )
         }
+        if (moduleChannel == null) {
+            moduleChannel = FlutterModuleChannel(flutterEngine.dartExecutor)
+        }
     }
 
     private fun getPageName(): String? {
-        return if (intent.hasExtra(EXTRA_ENTRY_POINT)) {
-            intent.getStringExtra(EXTRA_ENTRY_POINT)
+        return if (intent.hasExtra(EXTRA_ROUTE)) {
+            intent.getStringExtra(EXTRA_ROUTE)
         } else {
             null
         }
     }
 
     override fun getDartEntrypointFunctionName(): String {
-//        return if (intent.hasExtra(EXTRA_ENTRY_POINT)) {
-//            intent.getStringExtra(EXTRA_ENTRY_POINT)
-//        } else {
-//            super.getDartEntrypointFunctionName()
-//        }
         return "main"
     }
 }

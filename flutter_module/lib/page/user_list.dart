@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_module/bridge/flutter_method.dart';
+import 'package:flutter_module/bridge/native_method.dart';
 import 'package:flutter_module/model/user.dart';
 import 'package:flutter_module/net/http_util.dart';
 
@@ -33,6 +35,7 @@ class UserListState extends State<StatefulWidget> {
   @override
   Widget build(BuildContext context) {
     StatusBarUtil.dark(null);
+    FlutterMethod(context);
 
     // user FutureBuilder fro loading initially
     var contentView = Container(
@@ -205,6 +208,7 @@ class UserListState extends State<StatefulWidget> {
 
   Future<bool> _onBackPressed() {
     NavigatorUtil.pop(context, isSinglePage);
+    NativeMethod.showMyToast("_onBackPressed");
     return Future.value(false);
   }
 }
